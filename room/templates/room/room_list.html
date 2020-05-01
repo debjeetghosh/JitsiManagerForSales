@@ -48,7 +48,7 @@
                         <a href="{% url 'room:join_room' room.id %}" class="btn btn-primary">Join Meeting</a>
 
 
-                        <button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="https://vshop.pushmycart.com:8000{% url 'room:join_guest_room' room.room_id %}">
+                        <button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="https://meet.pushmycart.com:8000{% url 'room:join_guest_room' room.room_id %}">
                           Sharable link
                         </button>
                         <a href="{% url 'room:delete_room' room.id %}" class="btn btn-danger">Delete Meeting</a>
