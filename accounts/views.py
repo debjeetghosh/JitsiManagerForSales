@@ -152,7 +152,7 @@ class CreateUserView(View):
 
             Room.objects.create(
                 name='Customer care',
-                room_id=uuid.uuid4(),
+                room_id=str(int(time.time())*1000),
                 room_type=Room.PUBLIC,
                 created_by=user,
                 max_number_of_user=2,
