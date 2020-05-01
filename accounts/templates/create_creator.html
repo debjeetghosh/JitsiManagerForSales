@@ -3,7 +3,7 @@
 {% block contents %}
         {% if user.profile.user_type == 'admin' %}
         <div class="">
-            <h1>Create creator</h1>
+            <h1>Create a sales person</h1>
         </div>
         {% if errors %}
             <div class="alert alert-danger">{{ errors }}</div>
@@ -41,21 +41,21 @@
                         {{ field }}
                     </div>
                 {% endfor %}
-                {% for field in restriction_form.visible_fields %}
-                    <div class="form-group">
-                        {% if field.field.widget.is_hidden is not True %}
-                            {% if field.field.required %}
-                                <label>{{ field.label }}<span class="required"> * </span></label>
-                            {% else %}
-                                <label>{{ field.label }}</label>
-                            {% endif %}
-                        {% endif %}
-                        {{ field }}
-                        {% if field.help_text %}
-                            <small class="form-text text-muted">{{ field.help_text }}</small>
-                        {% endif %}
-                    </div>
-                {% endfor %}
+{#                {% for field in restriction_form.visible_fields %}#}
+{#                    <div class="form-group">#}
+{#                        {% if field.field.widget.is_hidden is not True %}#}
+{#                            {% if field.field.required %}#}
+{#                                <label>{{ field.label }}<span class="required"> * </span></label>#}
+{#                            {% else %}#}
+{#                                <label>{{ field.label }}</label>#}
+{#                            {% endif %}#}
+{#                        {% endif %}#}
+{#                        {{ field }}#}
+{#                        {% if field.help_text %}#}
+{#                            <small class="form-text text-muted">{{ field.help_text }}</small>#}
+{#                        {% endif %}#}
+{#                    </div>#}
+{#                {% endfor %}#}
                 <button type="submit" class="btn btn-primary">Create</button>
 
             </form>

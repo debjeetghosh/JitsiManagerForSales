@@ -1,3 +1,4 @@
+import time
 import uuid
 from random import randint
 
@@ -21,6 +22,7 @@ from accounts.forms import LoginForm, UserForm, UserProfileForm, UpdateAdminForm
 from accounts.models import UserProfile, JitsiUser, VerificationCode
 from restrictions.forms import RestrictionFormWithoutUserForm
 from restrictions.models import Restrictions
+from room.models import Room
 from utils.helpers import get_obj, split_name
 
 
@@ -114,20 +116,20 @@ class RegisterView(View):
 class CreateUserView(View):
     form = UserForm
     profile_form = UserProfileForm
-    restriction_form = RestrictionFormWithoutUserForm
+    # restriction_form = RestrictionFormWithoutUserForm
     template = 'create_creator.html'
 
     def get(self, request, *args, **kwargs):
         form = self.form()
         profile_form = self.profile_form()
-        restriction_form = self.restriction_form()
+        # restriction_form = self.restriction_form()
         return render(request, self.template, locals())
 
     def post(self, request, *args, **kwargs):
         form = self.form(request.POST)
         profile_form = self.profile_form(request.POST)
-        restriction_form = self.restriction_form(request.POST)
-        if form.is_valid() and profile_form.is_valid() and restriction_form.is_valid():
+        # restriction_form = self.restriction_form(request.POST)
+        if form.is_valid() and profile_form.is_valid():
             user = form.save(commit=False)
             user.password = make_password(form.cleaned_data.get('password'))
             user.first_name, user.last_name = split_name(profile_form.cleaned_data.get('name'))
@@ -136,12 +138,27 @@ class CreateUserView(View):
             user_profile = profile_form.save(commit=False)
             user_profile.user_uid = uuid.uuid4()
             user_profile.user = user
-            user_profile.user_type = UserProfile.CREATOR
+            user_profile.user_type = UserProfile.SALES_PERSON
             user_profile.save()
 
-            restriction = restriction_form.save(commit=False)
+            restriction = Restrictions.objects.create(
+                user=user,
+                max_time_length=-1,
+                max_room_count=1,
+                max_member_count=2
+            )
             restriction.user = user
             restriction.save()
+
+            Room.objects.create(
+                name='Customer care',
+                room_id=uuid.uuid4(),
+                room_type=Room.PUBLIC,
+                created_by=user,
+                max_number_of_user=2,
+                max_length=-1,
+                start_time=int(time.time()*1000)
+            )
 
             return redirect(reverse("accounts:dashboard"))
         return render(request, self.template, locals())
@@ -149,10 +166,16 @@ class CreateUserView(View):
 @method_decorator(login_required, name='dispatch')
 class DeleteUserView(View):
     def get(self, request, *args, **kwargs):
-        if request.user.is_staff and request.user.profile.user_type == UserProfile.ADMIN and request.user.is_superuser:
-            user_id = kwargs.get('pk')
-            JitsiUser.objects.get(id=user_id).delete()
+        user_id = kwargs.get('pk')
+        user = JitsiUser.objects.get(id=user_id)
+        if user.profile.user_type == UserProfile.ADMIN:
+            if request.user.is_staff and request.user.profile.user_type == UserProfile.ADMIN and request.user.is_superuser:
+                user.delete()
+                return redirect(reverse("accounts:dashboard"))
+        elif user.profile.user_type == UserProfile.SALES_PERSON and request.user.profile.user_type == UserProfile.ADMIN:
+            user.delete()
             return redirect(reverse("accounts:dashboard"))
+
 
 class UpdateUserPassword(View):
     form = UserPasswordForm
@@ -279,7 +302,7 @@ def login_submit(request):
                 login(request, user)
                 if 'next' in request.GET:
                     return redirect(request.GET.get('next', '/'))
-                if user.profile.user_type == UserProfile.CREATOR:
+                if user.profile.user_type == UserProfile.SALES_PERSON:
                     return redirect(reverse('accounts:dashboard'))
                 return redirect(reverse('accounts:verify-otp'))
             elif email_user and getattr(email_user, 'is_active', False):
@@ -287,7 +310,7 @@ def login_submit(request):
                 if user:
                     login(request, user)
 
-                    if user.profile.user_type == UserProfile.CREATOR:
+                    if user.profile.user_type == UserProfile.SALES_PERSON:
                         return redirect(reverse('accounts:dashboard'))
                     if 'next' in request.GET:
                         return redirect(request.GET.get('next', '/'))

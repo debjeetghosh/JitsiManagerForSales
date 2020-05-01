@@ -19,7 +19,7 @@ class MyUserManager(BaseUserManager):
         profile = UserProfile.objects.create(
             user=user,
             user_uid=uuid.uuid4(),
-            user_type=UserProfile.CREATOR,
+            user_type=UserProfile.ADMIN,
             name=username
         )
         return user
@@ -31,8 +31,8 @@ class JitsiUser(AbstractUser):
 
 
 class UserProfile(models.Model):
-    CREATOR, ADMIN = 'creator', 'admin'
-    USER_TYPE_CHOICES = ((CREATOR, "Content Creator"), (ADMIN, "Admin member"), )
+    SALES_PERSON, ADMIN = 'sales_person', 'admin'
+    USER_TYPE_CHOICES = ((SALES_PERSON, "Sales Person"), (ADMIN, "Admin member"), )
 
     user = models.OneToOneField(JitsiUser, models.CASCADE, related_name='profile')
     user_uid = models.CharField(max_length=255, default='')
