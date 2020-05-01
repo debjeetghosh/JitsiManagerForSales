@@ -1,11 +1,11 @@
-from .settings import * 
+from .settings import *
 DATABASES = {
     "default": {
-        "ENGINE":  "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
-        "USER": "user",
-        "PASSWORD": "password",
-        "HOST": "localhost",
-        "PORT":  "5432",
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'jitsi_db',
+        'USER': 'jitsi_user',
+        'PASSWORD': 'jitsi_password',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
