@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% load staticfiles %}
+{% load qr_code %}
+
+{% block contents %}
+    <div class="container">
+        <div class="text-center">
+            <img src="{% static 'img/company_logo.jpeg' %}" width="250">
+        </div> <br> <br>
+        {% if form.errors %}
+            <div class="alert alert-danger margin-center" style="width: 400px;">{{ form.errors }}</div>
+        {% endif %}
+        <div class="card shadow panel p30 margin-center" style="width: 400px;">
+
+            <div>
+                Check your email and please give otp
+            </div>
+            <form action="." method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ form.otp }}
+                </div>
+
+                <div class="clearfix">
+                    <div class="pull-right">
+                        <button type="submit" class="btn btn-default">Verify OTP</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+{% endblock %}

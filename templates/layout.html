@@ -1,0 +1,27 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% block title %}VoipX meet{% endblock %}
+    </title>
+    {% include "includes/css.html" %}
+    <link rel="icon" type="image/png" href="{% static 'img/favicon.ico' %}"/>
+</head>
+<body>
+<div id="wrapper">
+
+    <!-- Page Content -->
+    <div id="page-wrapper">
+        {% block contents %}{% endblock %}
+    </div>
+    <!-- /#page-content-wrapper -->
+
+</div>
+<!-- /#wrapper -->
+{% include 'includes/js.html' %}
+{% block page_scripts %}
+{% endblock %}
+</body>
+</html>
