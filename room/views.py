@@ -120,6 +120,8 @@ class RoomJoinView(View):
             if not room_obj.host_join_time:
                 room_obj.host_join_time = int(time())*1000
                 room_obj.save()
+            room_obj.room_status = Room.ACTIVE
+            room_obj.save()
             is_moderator = True
         if is_active and has_access:
             headers = {
@@ -163,6 +165,14 @@ class RoomDeleteView(View):
         room.delete()
         return redirect(reverse('room:room_list'))
 
+@method_decorator(login_required, name="dispatch")
+class RoomListForGuestView(View):
+    template = "room/room_list_guest.html"
+    def get(self, request, *args, **kwargs):
+        rooms = Room.objects.filter(created_by__profile__user_type=UserProfile.SALES_PERSON)
+        return render(request=request, template_name=self.template, context=locals())
+
+
 class GuestJoinView(View):
     template = "room/join_guest.html"
     password_template = 'room/password_prompt.html'
@@ -186,6 +196,9 @@ class GuestJoinView(View):
         has_access = False
         if not room_obj.is_active:
             is_active = False
+        if room_obj.room_status == Room.ACTIVE:
+            room_obj.room_status = Room.BUSY
+            room_obj.save()
         if room_obj.room_type == Room.PUBLIC:
             has_access = True
         if is_active and has_access:

@@ -11,6 +11,9 @@ class Room(models.Model):
     PUBLIC, PRIVATE = "public", "private"
     ROOM_TYPE = ((PUBLIC, "Public"), (PRIVATE, "Private"),)
 
+    ACTIVE, BUSY, AWAY = 'active', 'busy', 'away'
+    ROOM_STATUS_CHOICES = ((ACTIVE, 'active'), (BUSY, 'busy'), (AWAY, 'away'))
+
     name = models.CharField(max_length=255)
     room_id = models.CharField(max_length=255)
     room_type = models.CharField(max_length=255, choices=ROOM_TYPE, default='public')
@@ -22,6 +25,7 @@ class Room(models.Model):
     end_time = models.BigIntegerField(default=0)
     max_length = models.IntegerField(_("Maximum meeting time length (in Minutes)"), default=-1)
     password = models.CharField(max_length=20, null=True)
+    room_status = models.CharField(choices=ROOM_STATUS_CHOICES, max_length=20, default=AWAY)
 
     def status(self):
         time_now = int(time())*1000

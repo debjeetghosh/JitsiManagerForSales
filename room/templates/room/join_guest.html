@@ -7,8 +7,11 @@
         {% elif not has_access %}
             <h3 class="text-center">You have no permission in this room</h3>
         {% endif %}
+        {% if room_obj.room_status != 'active' %}
+            <h3 class="text-center">You cannot join the room right now</h3>
+        {% endif %}
 
-        {% if is_active and has_access %}
+        {% if is_active and has_access and room_obj.room_status == 'active' %}
 
             <div class="row">
                 <div class="col-md-12">

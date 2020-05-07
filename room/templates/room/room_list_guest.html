@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}
+{% load staticfiles %}
+{% block title %}VoipX meet{% endblock %}
+{% block contents %}
+    <div class="card shadow panel p30 margin-center" style="width: 50%;">
+        {% for room in rooms %}
+        <p>
+            <a href="{% url 'room:join_guest_room' room.room_id %}">Room {{ forloop.counter }} ({{ room.room_status }})</a>
+        </p>
+        {% endfor %}
+
+    </div>
+{% endblock %}
