@@ -5,7 +5,7 @@
     <div class="card shadow panel p30 margin-center" style="width: 50%;">
         {% for room in rooms %}
         <p>
-            <a href="{% url 'room:join_guest_room' room.room_id %}">Room {{ forloop.counter }} ({{ room.room_status }})</a>
+            <a href="{% url 'room:join_guest_room' room.room_id %}"> {{ room.created_by.profile.name }}({{ room.room_status }})</a>
         </p>
         {% endfor %}
 
