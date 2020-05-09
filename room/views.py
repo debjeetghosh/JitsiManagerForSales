@@ -165,7 +165,6 @@ class RoomDeleteView(View):
         room.delete()
         return redirect(reverse('room:room_list'))
 
-@method_decorator(login_required, name="dispatch")
 class RoomListForGuestView(View):
     template = "room/room_list_guest.html"
     def get(self, request, *args, **kwargs):
