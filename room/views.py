@@ -194,11 +194,13 @@ class GuestJoinView(View):
     def join_room(self, request, room_obj, guest_name):
         is_active = True
         has_access = False
-        if not room_obj.is_active:
+        me_guest = False
+        if not room_obj.is_active or room_obj.room_status != Room.ACTIVE:
             is_active = False
         if room_obj.room_status == Room.ACTIVE:
             room_obj.room_status = Room.BUSY
             room_obj.save()
+            me_guest = True
         if room_obj.room_type == Room.PUBLIC:
             has_access = True
         if is_active and has_access:
