@@ -234,4 +234,4 @@ class GuestJoinView(View):
             domain = 'vshop.pushmycart.com'
             creator = room_obj.created_by.profile.user_uid
             token = jwt.encode(payload, "example_app_secret", algorithm='HS256', headers=headers).decode('utf-8')
-            return render(request, self.template, locals())
+        return render(request, self.template, locals())
