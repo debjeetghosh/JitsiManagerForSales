@@ -5,6 +5,7 @@ app_name = 'room'
 urlpatterns = [
     path('room/create/', RoomCreateView.as_view(), name='create_room'),
     path('room/', RoomListView.as_view(), name='room_list'),
+    path('room/search_api/', RoomSearchApiView.as_view(), name='room_search_api'),
     path('room/<int:pk>/join/', RoomJoinView.as_view(), name='join_room'),
     path('room/<int:pk>/delete/', RoomDeleteView.as_view(), name='delete_room'),
     path('room/for-guest/', RoomListForGuestView.as_view() , name='room_list_for_guest'),

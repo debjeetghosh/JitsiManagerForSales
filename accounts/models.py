@@ -39,6 +39,31 @@ class UserProfile(models.Model):
     name = models.CharField(max_length=255)
     user_type = models.CharField(choices=USER_TYPE_CHOICES, max_length=255)
     totp_key = models.CharField(max_length=20, null=True)
+    user_city = models.ForeignKey('Location', models.CASCADE, related_name='city_users', null=True)
+    user_state = models.ForeignKey('Location', models.CASCADE, related_name='state_users', null=True)
+
+
+class Location(models.Model):
+    COUNTRY, STATE, CITY = 'country', 'state', 'city'
+    location_type_choices = (
+        (COUNTRY, 'country'),
+        (STATE, 'state'),
+        (CITY, 'city'),
+    )
+
+    name = models.CharField(max_length=255)
+    parent_location = models.ForeignKey('Location', models.CASCADE, related_name='child', null=True)
+    location_type = models.CharField(max_length=255, choices=location_type_choices)
+
+    def __str__(self):
+        return self.name+" ("+self.location_type+")"
+
+    def get_all_childs(self):
+        return Location.objects.filter(parent_location = self)
+
+    def get_childs_by_type(self, loc_type):
+        return self.get_all_childs().filter(location_type=loc_type)
+
 
 class VerificationCode(models.Model):
     user = models.ForeignKey(JitsiUser, on_delete=models.CASCADE)

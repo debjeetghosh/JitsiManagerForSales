@@ -3,11 +3,62 @@
 {% block title %}VoipX meet{% endblock %}
 {% block contents %}
     <div class="card shadow panel p30 margin-center" style="width: 50%;">
-        {% for room in rooms %}
-        <p>
-            <a href="{% url 'room:join_guest_room' room.room_id %}"> {{ room.created_by.profile.name }}({{ room.room_status }})</a>
-        </p>
-        {% endfor %}
+    <div class="row">
+        <div class="col-md-6">
+            State:<br>
 
+            <select name="state" class="form-control">
+            <option value="">------------------</option>
+                {% for state in states %}
+                    <option value="{{ state.id }}">{{ state }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-5">
+            City:<br>
+            <select name="city" class="form-control"></select>
+        </div>
+        <div class="col-md-1">
+            <br>
+            <button class="btn btn-primary" id="searchBtn">Search</button>
+        </div>
     </div>
+        <div>
+            <h2>Customer care persons:</h2>
+        <div class="roomContainer p20">
+
+        </div>
+        </div>
+    </div>
+{% endblock %}
+{% block page_scripts %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("select[name=state]").change(function () {
+                $("select[name=city]").html('');
+               var val = $("select[name=state]").val();
+               var type = 'city';
+               $.get('{% url 'accounts:location_api' %}?loc_id='+val+"&loc_type="+type, function(data, status){
+                   console.log(data);
+                   var html = '';
+                   for(var i=0;i<data.length;i++){
+                       html += "<option value='"+data[i].id+"'>"+data[i].text+"</option>";
+                   }
+                    $("select[name=city]").html(html);
+               });
+            });
+            $("#searchBtn").click(function () {
+                var state = $("select[name=state]").val();
+                var city = $("select[name=city]").val();
+                $.get('{% url 'room:room_search_api' %}?city='+city+"&state="+state, function(data, status){
+                   console.log(data);
+                   var html = '';
+                   for(var i=0;i<data.length;i++){
+                       html += "<p><a href='/room/"+data[i].uid+"/join/as-guest/'>"+data[i].user_name+" ("+data[i].status+")</p>";
+                   }
+                    $(".roomContainer").html(html);
+               });
+            })
+        });
+    </script>
 {% endblock %}

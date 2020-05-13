@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contents %}
+        {% if user.profile.user_type == 'admin' %}
+        <div class="">
+            {% if object %}
+                <h1>Update Location</h1>
+            {% else %}
+                <h1>Create Location</h1>
+            {% endif %}
+        </div>
+        {% if errors %}
+            <div class="alert alert-danger">{{ errors }}</div>
+        {% endif %}
+        <div>
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    {{ form.errors }}
+                </div>
+            {% endif %}
+            <form action="." method="post">
+                {% csrf_token %}
+                {% for field in form.visible_fields %}
+                    <div class="form-group">
+                        {% if field.field.widget.is_hidden is not True %}
+                            {% if field.field.required %}
+                                <label>{{ field.label }}<span class="required"> * </span></label>
+                            {% else %}
+                                <label>{{ field.label }}</label>
+                            {% endif %}
+                        {% endif %}
+                        {{ field }}
+                    </div>
+                {% endfor %}
+
+                {% if object %}
+                <button type="submit" class="btn btn-primary">Update</button>
+                {% else %}
+                <button type="submit" class="btn btn-primary">Create</button>
+                {% endif %}
+
+            </form>
+        </div>
+    {% else %}
+    <div class="alert alert-danger">
+    You do not have access to this page yet
+    </div>
+    {% endif %}
+{% endblock %}

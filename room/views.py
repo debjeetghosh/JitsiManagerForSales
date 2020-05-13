@@ -16,7 +16,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import ListView
 
-from accounts.models import UserProfile
+from accounts.models import UserProfile, Location
 from jitsi_helper.settings import JITSI_AUD, JITSI_ISSUER, JITSI_PRIVATE_KEY, JITSI_URL
 from restrictions.models import Restrictions
 from room.forms import RoomForm, RoomPasswordForm
@@ -86,6 +86,21 @@ class RoomListView(ListView):
         return Room.objects.filter(
             created_by=self.request.user
         )
+class RoomSearchApiView(View):
+    def get(self, request):
+        state = self.request.GET.get('state')
+        city = self.request.GET.get('city')
+        city = Location.objects.get(id=city)
+        state = Location.objects.get(id=state)
+        rooms = Room.objects.filter(created_by__profile__user_state=state, created_by__profile__user_city=city )
+        result = []
+        for room in rooms:
+            result.append({
+                "uid": room.room_id,
+                "user_name": room.created_by.profile.name,
+                "status": room.room_status
+            })
+        return JsonResponse(data=result, safe=False)
 
 
 @method_decorator(login_required, name="dispatch")
@@ -168,6 +183,7 @@ class RoomDeleteView(View):
 class RoomListForGuestView(View):
     template = "room/room_list_guest.html"
     def get(self, request, *args, **kwargs):
+        states = Location.objects.filter(location_type=Location.STATE)
         rooms = Room.objects.filter(created_by__profile__user_type=UserProfile.SALES_PERSON)
         return render(request=request, template_name=self.template, context=locals())
 

@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contents %}
+    {% if user.profile.user_type == 'admin' %}
+    <form method="post">{% csrf_token %}
+        <p>Are you sure you want to delete "{{ object }}"?</p>
+        <input type="submit" value="Confirm">
+    </form>
+    {% endif %}
+{% endblock %}

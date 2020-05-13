@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contents %}
+    {% if user.profile.user_type == 'admin' %}
+        <div class="">
+            <h3 class="pull-left">Locations</h3>
+            <div class="pull-right">
+                <a href="{% url 'accounts:create_location' %}" class="btn btn-primary">Create a location</a>
+            </div>
+        </div>
+        <table class="table table-basic">
+            <tr>
+                <td>#</td>
+                <td>Name</td>
+                <td>Type</td>
+                <td>Parent</td>
+                <td></td>
+            </tr>
+            {% for loc in object_list %}
+                <tr>
+                   <td>{{ forloop.counter }}</td>
+                   <td>{{ loc.name }}</td>
+                   <td>{{ loc.location_type }}</td>
+                   <td>{{ loc.parent_location }}</td>
+                   <td>
+                       <a href="{% url 'accounts:update_location' loc.id %}">Update</a>
+                       <a href="{% url 'accounts:delete_location' loc.id %}">Delete</a>
+                   </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+{% endblock %}

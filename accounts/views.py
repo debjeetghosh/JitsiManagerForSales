@@ -9,17 +9,19 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.generic import ListView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 from accounts.auth_helper import is_user_admin
-from accounts.forms import LoginForm, UserForm, UserProfileForm, UpdateAdminForm, OtpForm, UserPasswordForm
-from accounts.models import UserProfile, JitsiUser, VerificationCode
+from accounts.forms import LoginForm, UserForm, UserProfileForm, UpdateAdminForm, OtpForm, UserPasswordForm, \
+    LocationForm
+from accounts.models import UserProfile, JitsiUser, VerificationCode, Location
 from restrictions.forms import RestrictionFormWithoutUserForm
 from restrictions.models import Restrictions
 from room.models import Room
@@ -128,6 +130,7 @@ class CreateUserView(View):
     def post(self, request, *args, **kwargs):
         form = self.form(request.POST)
         profile_form = self.profile_form(request.POST)
+        profile_form.fields['city'].queryset = Location.objects.filter(id=request.POST.get('city'))
         # restriction_form = self.restriction_form(request.POST)
         if form.is_valid() and profile_form.is_valid():
             user = form.save(commit=False)
@@ -139,6 +142,8 @@ class CreateUserView(View):
             user_profile.user_uid = uuid.uuid4()
             user_profile.user = user
             user_profile.user_type = UserProfile.SALES_PERSON
+            user_profile.user_city = profile_form.cleaned_data.get('city')
+            user_profile.user_state = profile_form.cleaned_data.get('state')
             user_profile.save()
 
             restriction = Restrictions.objects.create(
@@ -256,6 +261,54 @@ class CreateAdminView(View):
         return render(request, self.template, locals())
 
 @method_decorator(login_required, name='dispatch')
+class LocationCreateView(CreateView):
+    form_class = LocationForm
+    template_name = 'location_create.html'
+    success_url = '/locations/'
+
+@method_decorator(login_required, name='dispatch')
+class LocationListView(ListView):
+    model = Location
+    template_name = 'location_list.html'
+
+@method_decorator(login_required, name='dispatch')
+class LocationUpdateView(UpdateView):
+    model = Location
+    form_class = LocationForm
+    template_name = 'location_create.html'
+    success_url = '/locations/'
+
+    def get_object(self, queryset=None, *args, **kwargs):
+        loc_id = self.kwargs.get('pk')
+        return Location.objects.get(id=loc_id)
+
+
+@method_decorator(login_required, name='dispatch')
+class LocationDeleteView(DeleteView):
+    model = Location
+    success_url = '/locations/'
+    template_name = 'location_delete.html'
+
+    def get_object(self, queryset=None):
+        loc_id = self.kwargs.get('pk')
+        return Location.objects.get(id=loc_id)
+
+class LocationApiView(View):
+    def get(self, request):
+        loc_id = request.GET.get('loc_id')
+        loc_type = request.GET.get('loc_type')
+
+        location = Location.objects.get(id = loc_id)
+        children_locs = location.get_childs_by_type(loc_type)
+        result = []
+        for l in children_locs:
+            result.append({
+                "id": l.id,
+                "text": str(l)
+            })
+        return JsonResponse(data=result, safe=False)
+
+@method_decorator(login_required, name='dispatch')
 class AdminListView(ListView):
     model = UserProfile
     template_name = 'admin_list.html'
@@ -266,6 +319,7 @@ class AdminListView(ListView):
         elif self.request.user.is_staff:
             return UserProfile.objects.filter(user_type=UserProfile.ADMIN, user__is_superuser=False)
         return UserProfile.objects.filter(user_type=UserProfile.ADMIN, user__is_superuser=False, user__is_staff=False)
+
 
 
 @method_decorator(login_required, name='dispatch')

@@ -2,7 +2,7 @@ import pyotp
 from django import forms
 from django.core.exceptions import NON_FIELD_ERRORS
 
-from accounts.models import UserProfile, JitsiUser
+from accounts.models import UserProfile, JitsiUser, Location
 
 
 class LoginForm(forms.Form):
@@ -15,7 +15,19 @@ class UpdateAdminForm(forms.ModelForm):
         model = JitsiUser
         fields = ['is_active', 'is_staff', 'is_superuser']
 
+class LocationForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(LocationForm, self).__init__(*args, **kwargs)
+        self.fields['parent_location'].required = False
 
+    class Meta:
+        model = Location
+        exclude = ('',)
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'location_type': forms.Select(attrs={'class': 'form-control'}),
+            'parent_location': forms.Select(attrs={'class': 'form-control'}),
+        }
 class OtpForm(forms.Form):
     otp = forms.CharField(max_length=200, widget=forms.TextInput(attrs={'class': 'form-control'}))
 
@@ -51,11 +63,15 @@ class UserForm(forms.ModelForm):
 
 
 class UserProfileForm(forms.ModelForm):
+    state = forms.ModelChoiceField(queryset=Location.objects.filter(location_type=Location.STATE), widget=forms.Select(attrs={'class': 'form-control'}))
+    city = forms.ModelChoiceField(queryset=Location.objects.none(), widget=forms.Select(attrs={'class': 'form-control'}))
 
     class Meta:
         model = UserProfile
         fields = [
             'name',
+            'state',
+            'city',
         ]
 
         widgets = {

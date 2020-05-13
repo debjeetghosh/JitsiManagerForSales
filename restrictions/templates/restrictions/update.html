@@ -24,6 +24,39 @@
                 {% endif %}
             </div>
         {% endfor %}
+        {% for field in profile_form %}
+            <div class="form-group">
+                {% if field.field.widget.is_hidden is not True %}
+                    {% if field.field.required %}
+                        <label>{{ field.label }}<span class="required"> * </span></label>
+                    {% else %}
+                        <label>{{ field.label }}</label>
+                    {% endif %}
+                {% endif %}
+                {{ field }}
+                {% if field.help_text %}
+                <small class="form-text text-muted">{{ field.help_text }}</small>
+                {% endif %}
+            </div>
+        {% endfor %}
         <button type="submit" class="btn btn-large btn-primary">Update</button>
     </form>
+{% endblock %}
+{% block page_script %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("select[name=state]").change(function () {
+               var val = $("select[name=state]").val();
+               var type = 'city';
+               $.get('{% url 'accounts:location_api' %}?loc_id='+val+"&loc_type="+type, function(data, status){
+                   console.log(data);
+                   var html = '';
+                   for(var i=0;i<data.length;i++){
+                       html += "<option value='"+data[i].id+"'>"+data[i].text+"</option>";
+                   }
+                    $("select[name=city]").html(html);
+               });
+            });
+        });
+    </script>
 {% endblock %}

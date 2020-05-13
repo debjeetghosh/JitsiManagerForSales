@@ -11,6 +11,8 @@
             <th>Maximum meetings count</th>
             <th>Maximum time length of meeting</th>
             <th>Maximum number of guest</th>
+            <th>State</th>
+            <th>City</th>
             <th></th>
         </tr>
         {% for restriction in object_list %}
@@ -37,6 +39,8 @@
                     {{ restriction.max_member_count }}
                     {% endif %}
                 </td>
+                <td>{{ restriction.user.profile.user_state }}</td>
+                <td>{{ restriction.user.profile.user_city }}</td>
 
                 <td>
                     <a href="{% url 'restrictions:restriction_update' restriction.id %}" class="btn btn-primary">Update</a>

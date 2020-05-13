@@ -66,3 +66,21 @@
     </div>
     {% endif %}
 {% endblock %}
+{% block page_script %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("select[name=state]").change(function () {
+               var val = $("select[name=state]").val();
+               var type = 'city';
+               $.get('{% url 'accounts:location_api' %}?loc_id='+val+"&loc_type="+type, function(data, status){
+                   console.log(data);
+                   var html = '';
+                   for(var i=0;i<data.length;i++){
+                       html += "<option value='"+data[i].id+"'>"+data[i].text+"</option>";
+                   }
+                    $("select[name=city]").html(html);
+               });
+            });
+        });
+    </script>
+{% endblock %}
