@@ -57,7 +57,7 @@
                    console.log(data);
                    var html = '';
                    for(var i=0;i<data.length;i++){
-                       html += "<p><a href='/room/"+data[i].uid+"/join/as-guest/'>"+data[i].user_name+" ("+data[i].status+")</p>";
+                       html += "<p><a href='/room/"+data[i].uid+"/join/as-guest/?n={{ guest_name }}'>"+data[i].user_name+" ("+data[i].status+")</p>";
                    }
                     $(".roomContainer").html(html);
                });

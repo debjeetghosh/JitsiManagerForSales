@@ -183,6 +183,7 @@ class RoomDeleteView(View):
 class RoomListForGuestView(View):
     template = "room/room_list_guest.html"
     def get(self, request, *args, **kwargs):
+        guest_name = request.GET.get('name', None)
         states = Location.objects.filter(location_type=Location.STATE)
         rooms = Room.objects.filter(created_by__profile__user_type=UserProfile.SALES_PERSON)
         return render(request=request, template_name=self.template, context=locals())
@@ -194,8 +195,9 @@ class GuestJoinView(View):
     password_form = RoomPasswordForm
 
     def get(self, request, *args, **kwargs):
+        guest_name = request.GET.get('n', None)
         room_obj = get_object_or_404(Room, room_id=kwargs.get('uid'))
-        form = self.password_form(room=room_obj)
+        form = self.password_form(room=room_obj, initial={'guest_name': guest_name})
         return render(request, self.password_template, locals())
 
     def post(self, request, *args, **kwargs):
