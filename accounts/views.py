@@ -375,6 +375,10 @@ def login_submit(request):
     return redirect(reverse("accounts:login"))
 
 def logout_view(request):
+    rooms = Room.objects.filter(created_by=request.user)
+    for r in rooms:
+        r.room_status = Room.OFFLINE
+        r.save()
     logout(request)
     return redirect(reverse("accounts:login"))
 

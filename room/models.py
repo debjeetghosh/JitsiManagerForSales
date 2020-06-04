@@ -11,7 +11,7 @@ class Room(models.Model):
     PUBLIC, PRIVATE = "public", "private"
     ROOM_TYPE = ((PUBLIC, "Public"), (PRIVATE, "Private"),)
 
-    ACTIVE, BUSY, AWAY = 'active', 'busy', 'away'
+    ACTIVE, BUSY, AWAY, OFFLINE = 'active', 'busy', 'away', 'offline'
     ROOM_STATUS_CHOICES = ((ACTIVE, 'active'), (BUSY, 'busy'), (AWAY, 'away'))
 
     name = models.CharField(max_length=255)
